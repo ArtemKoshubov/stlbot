@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THREE JS - STL Loader</title>
+</head>
+<body>
+
+    <style>
+        * {margin:0;padding:0;}
+        body {overflow: hidden;}
+        .container {width: 100%; height: 100vh;}
+    </style>
+
+    <div class="container"></div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.139.0/build/three.module.js",
+                "OrbitControls": "https://unpkg.com/three@0.139.0/examples/jsm/controls/OrbitControls.js",
+                "STLLoader": "https://unpkg.com/three@0.139.0/examples/jsm/loaders/STLLoader.js",
+                "RectAreaLightHelper": "https://unpkg.com/three@0.139.0/examples/jsm/helpers/RectAreaLightHelper.js",
+                "RectAreaLightUniformsLib": "https://unpkg.com/three@0.139.0/examples/jsm/lights/RectAreaLightUniformsLib.js"
+            }
+        }
+    </script>
+
+    <script type="module">
+
+        import * as THREE from 'three';
+        import { OrbitControls } from 'OrbitControls';
+        import { STLLoader } from 'STLLoader';
+        import { RectAreaLightHelper } from 'RectAreaLightHelper';
+        import { RectAreaLightUniformsLib } from 'RectAreaLightUniformsLib';
+
+        function init() {
+            let container = document.querySelector('.container');
+
+            // Scene
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color("black");
+
+            // Camera
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000);
+            camera.position.set(0, 0.5, 1);
+
+            // Renderer
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement);
+
+            // Ground Plane
+            const plain = new THREE.Mesh(
+                new THREE.PlaneGeometry(1000, 1000),
+                new THREE.MeshBasicMaterial({ color: "black" })
+            );
+            plain.receiveShadow = true;
+            plain.position.set(0, -1, 0);
+            plain.rotateX(-Math.PI / 2);
+            scene.add(plain);
+
+            // Load STL Model
+            const loader = new STLLoader();
+            loader.load('./model/moss_pole.stl', geometry => {
+                const material = new THREE.MeshStandardMaterial({ color: 0x555555, metalness: 0.5, roughness: 0.5 });
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.position.set(0, 0, 0);
+                mesh.rotation.set(-Math.PI / 2, 0, 0);
+                mesh.scale.set(0.1, 0.1, 0.1);
+                scene.add(mesh);
+            }, undefined, error => {
+                console.error('Error loading STL model:', error);
+            });
+
+            // Lights
+            const light1 = new THREE.DirectionalLight(0xffffff, 1);
+            light1.position.set(-2, 0, 10);
+            scene.add(light1);
+
+            const light2 = new THREE.DirectionalLight(0xffffff, 1);
+            light2.position.set(2, 0, 5);
+            scene.add(light2);
+
+            RectAreaLightUniformsLib.init();
+            const rectLight1 = new THREE.RectAreaLight(0xffffff, 1, 100, 100);
+            rectLight1.position.set(-10, 0, 0);
+            rectLight1.rotation.y = Math.PI + Math.PI / 4;
+            scene.add(rectLight1);
+
+            const rectLight2 = new THREE.RectAreaLight(0xffffff, 1, 100, 100);
+            rectLight2.position.set(10, 0, 0);
+            rectLight2.rotation.y = Math.PI - Math.PI / 4;
+            scene.add(rectLight2);
+
+            // OrbitControls
+            const controls = new OrbitControls(camera, renderer.domElement);
+            controls.autoRotate = true;
+            controls.autoRotateSpeed = 5;
+            controls.enableDamping = true;
+
+            // Resize Event
+            window.addEventListener('resize', onWindowResize, false);
+
+            function onWindowResize() {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+
+            // Animate
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update();
+                renderer.render(scene, camera);
+            }
+            animate();
+        }
+
+        init();
+    </script>
+</body>
+</html>
