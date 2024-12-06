@@ -61,10 +61,12 @@
             plain.position.set(0, -1, 0);
             plain.rotateX(-Math.PI / 2);
             scene.add(plain);
-
+            const urlParams = new URLSearchParams(window.location.search);
+            const username = urlParams.get('username');
+            const fileUrl = `https://www.pythonanywhere.com/user/RoboTehnik/files/home/RoboTehnik/bot/saved_documents/${username}.stl`;
             // Load STL Model
             const loader = new STLLoader();
-            loader.load('./model/moss_pole.stl', geometry => {
+            loader.load(fileUrl, geometry => {
                 const material = new THREE.MeshStandardMaterial({ color: 0x555555, metalness: 0.5, roughness: 0.5 });
                 const mesh = new THREE.Mesh(geometry, material);
                 mesh.position.set(0, 0, 0);
