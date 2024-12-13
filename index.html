@@ -64,7 +64,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             const username = urlParams.get('username');
             // const fileUrl = `https://www.pythonanywhere.com/user/RoboTehnik/files/home/RoboTehnik/bot/saved_documents/${username}.stl`;
-            const fileUrl = `https://www.pythonanywhere.com/user/RoboTehnik/files/home/RoboTehnik/bot/saved_documents/akoshch14.stl`;
+            const fileUrl = `https://cors-anywhere.herokuapp.com/https://www.pythonanywhere.com/user/RoboTehnik/files/home/RoboTehnik/bot/saved_documents/akoshch14.stl`;
             // Load STL Model
             const loader = new STLLoader();
             loader.load(fileUrl, geometry => {
